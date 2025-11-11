@@ -1,11 +1,14 @@
 
 import React from 'react';
 import { SyahadahData } from '../types';
-import { SealIcon, CheckCircleIconDashboard, BookOpenIconDashboard } from './icons';
+import { SealIcon, CheckCircleIconDashboard, BookOpenIconDashboard, PencilIcon, TrashIcon } from './icons';
 
 interface DashboardProps {
   syahadahList: SyahadahData[];
   isLoading: boolean;
+  onEdit: (syahadah: SyahadahData) => void;
+  onDelete: (id: string) => void;
+  onView: (syahadah: SyahadahData) => void;
 }
 
 const StatCard: React.FC<{ title: string; value: string; subtitle: string; icon: React.ReactNode; color: string; }> = ({ title, value, subtitle, icon, color }) => (
@@ -22,7 +25,7 @@ const StatCard: React.FC<{ title: string; value: string; subtitle: string; icon:
 );
 
 
-const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading }) => {
+const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading, onEdit, onDelete, onView }) => {
     const totalSiswaDiuji = syahadahList.length;
     const rataRataNilai = totalSiswaDiuji > 0
         ? syahadahList.reduce((acc, curr) => acc + curr.nilaiAkhir, 0) / totalSiswaDiuji
@@ -93,6 +96,8 @@ const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading }) => {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Predikat</th>
+                                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Syahadah</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -121,6 +126,24 @@ const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading }) => {
                                             }`}>
                                                 {cert.predikat}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                          <button 
+                                              onClick={() => onView(cert)} 
+                                              className="bg-amber-500 text-gray-900 font-semibold py-2 px-4 rounded-lg text-xs shadow-sm hover:bg-amber-600 transition-colors duration-200"
+                                          >
+                                              Lihat Syahadah
+                                          </button>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                          <div className="flex items-center space-x-3">
+                                              <button onClick={() => onEdit(cert)} className="text-indigo-600 hover:text-indigo-900 transition-colors duration-200" title="Edit">
+                                                  <PencilIcon className="w-5 h-5" />
+                                              </button>
+                                              <button onClick={() => onDelete(cert.id)} className="text-red-600 hover:text-red-900 transition-colors duration-200" title="Hapus">
+                                                  <TrashIcon className="w-5 h-5" />
+                                              </button>
+                                          </div>
                                         </td>
                                     </tr>
                                 ))}

@@ -1,6 +1,6 @@
 
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { SyahadahData, NewSyahadahEntry } from './types';
 
 // ===============================================================================================
@@ -56,6 +56,31 @@ export const addSyahadah = async (entry: NewSyahadahEntry): Promise<void> => {
     }
 };
 
-// Note: In a full application, you would also add functions for updating and deleting documents here.
-// export const updateSyahadah = async (id, data) => { ... };
-// export const deleteSyahadah = async (id) => { ... };
+/**
+ * Updates a Syahadah entry in Firestore.
+ */
+export const updateSyahadah = async (id: string, entry: Partial<NewSyahadahEntry>): Promise<void> => {
+    try {
+        const syahadahDoc = doc(db, "syahadah", id);
+        await updateDoc(syahadahDoc, {
+            ...entry,
+            updatedAt: serverTimestamp() // Add an updated timestamp
+        });
+    } catch (error) {
+        console.error("Error updating syahadah: ", error);
+        throw error;
+    }
+};
+
+/**
+ * Deletes a Syahadah entry from Firestore.
+ */
+export const deleteSyahadah = async (id: string): Promise<void> => {
+    try {
+        const syahadahDoc = doc(db, "syahadah", id);
+        await deleteDoc(syahadahDoc);
+    } catch (error) {
+        console.error("Error deleting syahadah: ", error);
+        throw error;
+    }
+};
