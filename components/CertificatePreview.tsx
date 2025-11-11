@@ -5,11 +5,6 @@ interface CertificatePreviewProps {
   data: CertificateData;
 }
 
-// NOTE: Please create an 'assets' folder in your project's root directory
-// and place your certificate template image inside it.
-// The image should be named 'certificate_template.png' for this component to work correctly.
-const certificateTemplateUrl = './assets/certificate_template.png';
-
 export const CertificatePreview = forwardRef<HTMLDivElement, CertificatePreviewProps>(({ data }, ref) => {
     
     const formattedGregorianDate = data.date ? new Date(data.date).toLocaleDateString('id-ID', {
@@ -21,40 +16,39 @@ export const CertificatePreview = forwardRef<HTMLDivElement, CertificatePreviewP
     return (
         <div 
             ref={ref} 
-            className="w-full h-full bg-white text-black relative font-serif overflow-hidden bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${certificateTemplateUrl})` }}
+            className="w-full h-full bg-white text-gray-800 relative font-serif overflow-hidden p-12 border-8 border-teal-700 flex flex-col items-center justify-between"
         >
-            {/* This component uses a background image as the template. */}
-            {/* All text elements are absolutely positioned on top of it. */}
-            
-            <div className="absolute inset-0">
-                {/* Student Name */}
-                <p className="absolute text-center w-full font-bold text-4xl" style={{ top: '40%', left: '40.5%', transform: 'translateX(-50%)', color: '#3a3a3a', fontFamily: 'serif' }}>
+            <div className="text-center">
+                <h1 className="font-bold text-5xl tracking-wider text-teal-800">SYAHADAH</h1>
+                <h2 className="text-3xl mt-2 text-gray-700">Tahfizh Al - Qur'an</h2>
+                <div className="w-48 h-1 bg-teal-600 mx-auto mt-4"></div>
+            </div>
+
+            <div className="text-center my-8">
+                <p className="text-xl">Diberikan kepada :</p>
+                <p className="font-bold text-4xl mt-4" style={{ fontFamily: 'serif' }}>
                     {data.studentName}
                 </p>
+            </div>
+            
+            <div className="text-center text-lg leading-relaxed" style={{ fontFamily: 'sans-serif' }}>
+                <p>Telah dinyatakan Lulus Ujian Syahadah Al-Qur'an Juz <span className="font-bold">{data.juz}</span></p>
+                <p className="mt-1">
+                    pada tanggal <span className="font-bold">{formattedGregorianDate}</span>
+                </p>
+                 <p>
+                    dengan nilai <span className="font-bold">{data.grade}</span> dan predikat <span className="font-bold">{data.predicate}</span>
+                </p>
+            </div>
 
-                {/* Main Declaration Text */}
-                <div className="absolute text-center text-lg leading-tight" style={{ top: '52.5%', left: '40.5%', transform: 'translateX(-50%)', width: '65%', fontFamily: 'sans-serif', color: '#3a3a3a' }}>
-                    <p>Telah dinyatakan Lulus Ujian Syahadah Al-Qur'an Juz {data.juz}</p>
-                    <p className="mt-1">
-                        pada tanggal, <span className="font-bold">{formattedGregorianDate}</span>
-                    </p>
-                     <p>
-                        dengan nilai : <span className="font-bold inline-block w-24 text-center">{data.grade}</span> dan predikat <span className="font-bold inline-block w-32 text-center">{data.predicate}</span>
-                    </p>
+            <div className="w-full flex justify-around mt-16 pt-8 text-center text-lg" style={{ fontFamily: 'sans-serif' }}>
+                <div>
+                    <p className="font-bold">Mudir</p>
+                    <p className="mt-20 border-t border-gray-400 px-8 pt-2">{data.mudirName}</p>
                 </div>
-                
-                {/* JUZ in Seal */}
-                 <div className="absolute text-center" style={{ top: '58.5%', left: '80.5%', transform: 'translate(-50%, -50%)' }}>
-                    <span className="text-yellow-900 font-bold text-3xl">{data.juz}</span>
-                </div>
-
-                {/* Signatures */}
-                <div className="absolute text-white font-bold text-center" style={{ bottom: '11.8%', left: '16.5%', width: '15%', fontFamily: 'sans-serif', fontSize: '1.1rem' }}>
-                    {data.mudirName}
-                </div>
-                <div className="absolute text-white font-bold text-center" style={{ bottom: '11.8%', left: '61.5%', width: '15%', fontFamily: 'sans-serif', fontSize: '1.1rem' }}>
-                    {data.coordinatorName}
+                <div>
+                    <p className="font-bold">Koordinator Tahfizh</p>
+                    <p className="mt-20 border-t border-gray-400 px-8 pt-2">{data.coordinatorName}</p>
                 </div>
             </div>
         </div>
