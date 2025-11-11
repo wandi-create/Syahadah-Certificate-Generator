@@ -8,12 +8,12 @@ import { SyahadahData, NewSyahadahEntry } from './types';
 // You can get this from your project's settings in the Firebase console.
 // ===============================================================================================
 const firebaseConfig = {
-  apiKey: "AIzaSyAa1blSO3EiPIKmmw_Sq_JSCLWnroVicvw",
-  authDomain: "syahadahgenerator.firebaseapp.com",
-  projectId: "syahadahgenerator",
-  storageBucket: "syahadahgenerator.firebasestorage.app",
-  messagingSenderId: "953608521775",
-  appId: "1:953608521775:web:6c793556b7b107fa0a9eda"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
