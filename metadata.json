@@ -1,0 +1,5 @@
+{
+  "name": "Syahadah Certificate Generator",
+  "description": "An application to generate personalized 'Syahadah Tahfizh Al-Qur'an' certificates. Users can input student details, see a live preview, and download the final certificate as a PDF.",
+  "requestFramePermissions": []
+}
