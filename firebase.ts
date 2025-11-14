@@ -7,17 +7,18 @@ import { SyahadahData, NewSyahadahEntry } from './types';
 // IMPORTANT: Replace with your actual Firebase project configuration
 // You can get this from your project's settings in the Firebase console.
 // ===============================================================================================
-// FIX: Switched from `import.meta.env` to `process.env` to resolve the runtime error
-// "Cannot read properties of undefined". The execution environment for this application
-// provides environment variables via `process.env`, not `import.meta.env`.
-// Casting `process` to `any` prevents TypeScript errors in the browser environment.
+// FIX: Reverted to `process.env` to resolve a runtime error. The execution environment
+// provides environment variables via `process.env`, and `import.meta.env` was found to be
+// undefined, causing the application to crash.
+// Casting to `any` is used to bypass TypeScript errors, assuming `process.env` is populated
+// by the build tool.
 const firebaseConfig = {
-  apiKey: (process as any).env.VITE_FIREBASE_API_KEY,
-  authDomain: (process as any).env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: (process as any).env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: (process as any).env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: (process as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: (process as any).env.VITE_FIREBASE_APP_ID
+  apiKey: (process.env as any).VITE_FIREBASE_API_KEY,
+  authDomain: (process.env as any).VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: (process.env as any).VITE_FIREBASE_PROJECT_ID,
+  storageBucket: (process.env as any).VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: (process.env as any).VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: (process.env as any).VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase

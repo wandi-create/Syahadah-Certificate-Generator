@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { NewSyahadahEntry, SyahadahData } from '../types';
+import { ClipboardCheckIcon } from './icons';
 
 const InputField: React.FC<{
     label: string;
@@ -38,6 +38,7 @@ const initialFormData = {
     gender: '',
     juz: '',
     tanggalUjian: new Date().toISOString().split('T')[0],
+    tanggalUjianHijriah: '',
     jmlKetuk: 0,
     jmlTuntun: 0,
     jmlTajwid: 0,
@@ -48,12 +49,6 @@ const juzOrder = [30, 29, 28, 27, 26, ...Array.from({ length: 25 }, (_, i) => i 
 const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelEdit }) => {
     const [formData, setFormData] = useState(initialFormData);
     const [isSaving, setIsSaving] = useState(false);
-    const [hijriDate, setHijriDate] = useState('');
-    const [hasil, setHasil] = useState({
-        nilaiAkhir: 100,
-        predikat: "Mumtaz Murtafi'",
-        status: 'Lulus'
-    });
 
     useEffect(() => {
         if (syahadahToEdit) {
@@ -63,47 +58,15 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                 gender: syahadahToEdit.gender,
                 juz: syahadahToEdit.juz,
                 tanggalUjian: syahadahToEdit.tanggalUjian.split('T')[0], // Ensure correct date format
+                tanggalUjianHijriah: syahadahToEdit.tanggalUjianHijriah || '',
                 jmlKetuk: syahadahToEdit.jmlKetuk,
                 jmlTuntun: syahadahToEdit.jmlTuntun,
                 jmlTajwid: syahadahToEdit.jmlTajwid,
             });
-            setHijriDate(syahadahToEdit.tanggalUjianHijriah || '');
         } else {
             setFormData(initialFormData);
-            setHijriDate('');
         }
     }, [syahadahToEdit]);
-
-
-    useEffect(() => {
-        const { jmlKetuk, jmlTuntun, jmlTajwid, tanggalUjian } = formData;
-        
-        const nilaiAkhir = 100 - (jmlKetuk * 0.5) - (jmlTuntun * 1) - (jmlTajwid * 0.25);
-        const clampedNilai = Math.max(0, nilaiAkhir);
-
-        let predikat = '';
-        if (clampedNilai === 100) predikat = "Mumtaz Murtafi'";
-        else if (clampedNilai >= 90) predikat = "Mumtaz";
-        else if (clampedNilai >= 80) predikat = "Jayyid Jiddan";
-        else if (clampedNilai >= 70) predikat = "Maqbul";
-        else predikat = "Rasib";
-        
-        const status = clampedNilai >= 75 ? 'Lulus' : 'Tidak Lulus';
-
-        setHasil({
-            nilaiAkhir: clampedNilai,
-            predikat,
-            status
-        });
-        
-        const HijriDate = (window as any).HijriDate;
-        const gregorianDate = new Date(tanggalUjian);
-        const hijriDateString = HijriDate && !isNaN(gregorianDate.getTime())
-            ? new HijriDate(gregorianDate).toHijriString('iDD iMMMM iYYYY')
-            : '';
-        setHijriDate(hijriDateString);
-
-    }, [formData.jmlKetuk, formData.jmlTuntun, formData.jmlTajwid, formData.tanggalUjian]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -111,6 +74,28 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
             ...prev,
             [name]: name.startsWith('jml') ? Math.max(0, parseInt(value, 10) || 0) : value
         }));
+    };
+
+    // --- Derived State Calculation ---
+    // Calculate results directly on each render to avoid stale state issues.
+    const { jmlKetuk, jmlTuntun, jmlTajwid } = formData;
+    
+    const nilaiAkhir = 100 - (jmlKetuk * 0.5) - (jmlTuntun * 1) - (jmlTajwid * 0.25);
+    const clampedNilai = Math.max(0, nilaiAkhir);
+
+    let predikat = '';
+    if (clampedNilai === 100) predikat = "Mumtaz Murtafi'";
+    else if (clampedNilai >= 90) predikat = "Mumtaz";
+    else if (clampedNilai >= 80) predikat = "Jayyid Jiddan";
+    else if (clampedNilai >= 70) predikat = "Maqbul";
+    else predikat = "Rasib";
+    
+    const status = clampedNilai >= 75 ? 'Lulus' : 'Tidak Lulus';
+
+    const hasil = {
+        nilaiAkhir: clampedNilai,
+        predikat,
+        status
     };
     
     const handleSave = async () => {
@@ -120,10 +105,10 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
         }
 
         setIsSaving(true);
+        // Use the derived values which are guaranteed to be up-to-date with formData
         const dataToSave: NewSyahadahEntry = {
             ...formData,
             ...hasil,
-            tanggalUjianHijriah: hijriDate,
         };
         await onSave(dataToSave, syahadahToEdit?.id);
         setIsSaving(false);
@@ -131,14 +116,19 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
 
     return (
         <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800" style={{fontFamily: 'serif'}}>
-                    {syahadahToEdit ? 'Edit Penilaian Syahadah' : 'Form Penilaian Syahadah'}
-                </h1>
-                <p className="text-gray-500 mt-1">
-                    {syahadahToEdit ? `Mengedit data untuk ${syahadahToEdit.namaSiswa}.` : 'Isi data siswa dan nilai ujian untuk syahadah.'}
-                </p>
-            </div>
+             <header style={{background: 'linear-gradient(90deg, #2a2a72 0%, #4a2f8c 100%)'}} className="text-white p-6 rounded-xl shadow-lg flex items-center mb-8">
+                <div className="bg-white/10 p-3 rounded-lg mr-5">
+                   <ClipboardCheckIcon className="w-8 h-8"/>
+                </div>
+                <div>
+                    <h1 className="text-3xl font-bold">
+                        {syahadahToEdit ? 'Edit Penilaian Syahadah' : 'Form Penilaian Syahadah'}
+                    </h1>
+                    <p className="text-indigo-200 mt-1">
+                        {syahadahToEdit ? `Mengedit data untuk ${syahadahToEdit.namaSiswa}.` : 'Isi data siswa dan nilai ujian untuk syahadah.'}
+                    </p>
+                </div>
+            </header>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 flex flex-col gap-8">
@@ -209,11 +199,11 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                                     onChange={handleChange}
                                 />
                                  <InputField
-                                    label="Tanggal Hijriah"
-                                    id="tanggalHijriah"
-                                    value={hijriDate}
-                                    onChange={() => {}}
-                                    readOnly={true}
+                                    label="Tanggal Hijriah (Manual)"
+                                    id="tanggalUjianHijriah"
+                                    value={formData.tanggalUjianHijriah}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: 12 Dzulhijjah 1445"
                                 />
                            </div>
                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -272,7 +262,7 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                             >
                                 {isSaving ? (
                                     <>
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="http://www.w3.org/2000/svg">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
