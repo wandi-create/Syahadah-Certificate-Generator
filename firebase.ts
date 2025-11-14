@@ -65,10 +65,25 @@ export const getSyahadahList = async (): Promise<SyahadahData[]> => {
  */
 export const addSyahadah = async (entry: NewSyahadahEntry): Promise<void> => {
     try {
-        await addDoc(syahadahCollectionRef, {
-            ...entry,
+        // FIX: Explicitly construct a clean payload to prevent passing non-serializable
+        // or unexpected properties (which can cause a "circular structure" error) to
+        // the add function. This mirrors the safe implementation of `updateSyahadah`.
+        const payload = {
+            namaSiswa: entry.namaSiswa,
+            kelas: entry.kelas,
+            gender: entry.gender,
+            juz: entry.juz,
+            tanggalUjian: entry.tanggalUjian,
+            tanggalUjianHijriah: entry.tanggalUjianHijriah,
+            jmlKetuk: entry.jmlKetuk,
+            jmlTuntun: entry.jmlTuntun,
+            jmlTajwid: entry.jmlTajwid,
+            nilaiAkhir: entry.nilaiAkhir,
+            predikat: entry.predikat,
+            status: entry.status,
             createdAt: serverTimestamp() // Add a server-side timestamp
-        });
+        };
+        await addDoc(syahadahCollectionRef, payload);
     } catch (error) {
         console.error("Error adding new syahadah: ", error);
         throw error; // Re-throw to be handled by the component
