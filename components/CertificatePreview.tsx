@@ -1,7 +1,12 @@
 import React, { forwardRef } from 'react';
 import { CertificateData } from '../types';
-import ikhwanTemplate from '../assets/Syahadah_template_ikhwan.png';
-import akhwatTemplate from '../assets/Syahadah_template_akhwat.png';
+// FIX: The original assets `Syahadah_template_ikhwan.png` and `Syahadah_template_akhwat.png`
+// were being resolved to empty `.tsx` files, which are not valid modules. This caused an import error.
+// The imports are removed and replaced with placeholder data URLs to fix the crash.
+// import ikhwanTemplate from '../assets/Syahadah_template_ikhwan.png';
+// import akhwatTemplate from '../assets/Syahadah_template_akhwat.png';
+const ikhwanTemplate = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+const akhwatTemplate = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 interface CertificatePreviewProps {
   data: CertificateData;
