@@ -1,7 +1,7 @@
 
 import React, { useRef, useState } from 'react';
 import { CertificateData } from '../types';
-import { CertificatePreview } from './CertificatePreview';
+import { CertificatePreview } from '.@/assets/Syahadah_template_ikhwan.jpg';
 
 interface CertificateViewerProps {
     data: CertificateData;
