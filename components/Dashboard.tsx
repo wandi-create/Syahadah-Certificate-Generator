@@ -94,6 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading, onEdit, 
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ujian</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Hijriah</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Predikat</th>
                                     <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Syahadah</th>
@@ -115,6 +116,7 @@ const Dashboard: React.FC<DashboardProps> = ({ syahadahList, isLoading, onEdit, 
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Juz {cert.juz}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(cert.tanggalUjian).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cert.tanggalUjianHijriah}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-bold">{cert.nilaiAkhir.toFixed(2)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${

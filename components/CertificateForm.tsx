@@ -45,8 +45,8 @@ const getPredicate = (grade: number): string => {
 
 
 export const CertificateForm: React.FC<CertificateFormProps> = ({ data, setData, onGeneratePdf, isGenerating, onSave, onNew }) => {
-  // @ts-ignore
-  const HijriDate = window.HijriDate;
+  // FIX: Cast window.HijriDate to any to resolve constructor signature error.
+  const HijriDate = (window as any).HijriDate;
     
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

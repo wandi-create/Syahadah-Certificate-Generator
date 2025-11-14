@@ -1,19 +1,23 @@
 
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { SyahadahData, NewSyahadahEntry } from './types';
 
 // ===============================================================================================
 // IMPORTANT: Replace with your actual Firebase project configuration
 // You can get this from your project's settings in the Firebase console.
 // ===============================================================================================
+// FIX: Switched from `import.meta.env` to `process.env` to resolve the runtime error
+// "Cannot read properties of undefined". The execution environment for this application
+// provides environment variables via `process.env`, not `import.meta.env`.
+// Casting `process` to `any` prevents TypeScript errors in the browser environment.
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: (process as any).env.VITE_FIREBASE_API_KEY,
+  authDomain: (process as any).env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: (process as any).env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: (process as any).env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: (process as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: (process as any).env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
@@ -30,10 +34,25 @@ export const getSyahadahList = async (): Promise<SyahadahData[]> => {
     try {
         const q = query(syahadahCollectionRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        } as SyahadahData));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+
+            // Sanitize data to ensure it is fully serializable before being stored in React state.
+            // Firebase Timestamp objects can cause errors ("circular structure to JSON") if they are
+            // inadvertently passed back in an update operation.
+            const sanitizedData = { ...data };
+            for (const key in sanitizedData) {
+                if (sanitizedData[key] instanceof Timestamp) {
+                    // Convert Timestamp to a serializable ISO string.
+                    sanitizedData[key] = sanitizedData[key].toDate().toISOString();
+                }
+            }
+
+            return {
+                id: doc.id,
+                ...sanitizedData,
+            } as SyahadahData;
+        });
     } catch (error) {
         console.error("Error fetching syahadah list: ", error);
         // In a real app, you might want to show a user-facing error.
@@ -62,10 +81,28 @@ export const addSyahadah = async (entry: NewSyahadahEntry): Promise<void> => {
 export const updateSyahadah = async (id: string, entry: Partial<NewSyahadahEntry>): Promise<void> => {
     try {
         const syahadahDoc = doc(db, "syahadah", id);
-        await updateDoc(syahadahDoc, {
-            ...entry,
-            updatedAt: serverTimestamp() // Add an updated timestamp
+        
+        // FIX: Explicitly construct a clean payload to prevent passing non-serializable
+        // objects (which cause the "circular structure" error) to the update function.
+        // This ensures that only the intended data fields are updated.
+        const payload: { [key: string]: any } = {};
+        
+        // Map all possible fields from the entry to the payload
+        const fields: (keyof NewSyahadahEntry)[] = [
+            'namaSiswa', 'kelas', 'gender', 'juz', 'tanggalUjian', 'tanggalUjianHijriah',
+            'jmlKetuk', 'jmlTuntun', 'jmlTajwid', 'nilaiAkhir', 
+            'predikat', 'status'
+        ];
+
+        fields.forEach(field => {
+            if (entry[field] !== undefined) {
+                payload[field] = entry[field];
+            }
         });
+
+        payload.updatedAt = serverTimestamp(); // Add an updated timestamp
+
+        await updateDoc(syahadahDoc, payload);
     } catch (error) {
         console.error("Error updating syahadah: ", error);
         throw error;

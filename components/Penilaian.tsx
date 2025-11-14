@@ -9,7 +9,8 @@ const InputField: React.FC<{
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     type?: string;
     placeholder?: string;
-}> = ({ label, id, value, onChange, type = 'text', placeholder }) => (
+    readOnly?: boolean;
+}> = ({ label, id, value, onChange, type = 'text', placeholder, readOnly = false }) => (
     <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <input
@@ -19,7 +20,8 @@ const InputField: React.FC<{
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            readOnly={readOnly}
+            className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm read-only:bg-gray-200 read-only:cursor-not-allowed"
         />
     </div>
 );
@@ -41,10 +43,12 @@ const initialFormData = {
     jmlTajwid: 0,
 };
 
+const juzOrder = [30, 29, 28, 27, 26, ...Array.from({ length: 25 }, (_, i) => i + 1)];
 
 const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelEdit }) => {
     const [formData, setFormData] = useState(initialFormData);
     const [isSaving, setIsSaving] = useState(false);
+    const [hijriDate, setHijriDate] = useState('');
     const [hasil, setHasil] = useState({
         nilaiAkhir: 100,
         predikat: "Mumtaz Murtafi'",
@@ -63,14 +67,16 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                 jmlTuntun: syahadahToEdit.jmlTuntun,
                 jmlTajwid: syahadahToEdit.jmlTajwid,
             });
+            setHijriDate(syahadahToEdit.tanggalUjianHijriah || '');
         } else {
             setFormData(initialFormData);
+            setHijriDate('');
         }
     }, [syahadahToEdit]);
 
 
     useEffect(() => {
-        const { jmlKetuk, jmlTuntun, jmlTajwid } = formData;
+        const { jmlKetuk, jmlTuntun, jmlTajwid, tanggalUjian } = formData;
         
         const nilaiAkhir = 100 - (jmlKetuk * 0.5) - (jmlTuntun * 1) - (jmlTajwid * 0.25);
         const clampedNilai = Math.max(0, nilaiAkhir);
@@ -89,8 +95,15 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
             predikat,
             status
         });
+        
+        const HijriDate = (window as any).HijriDate;
+        const gregorianDate = new Date(tanggalUjian);
+        const hijriDateString = HijriDate && !isNaN(gregorianDate.getTime())
+            ? new HijriDate(gregorianDate).toHijriString('iDD iMMMM iYYYY')
+            : '';
+        setHijriDate(hijriDateString);
 
-    }, [formData.jmlKetuk, formData.jmlTuntun, formData.jmlTajwid]);
+    }, [formData.jmlKetuk, formData.jmlTuntun, formData.jmlTajwid, formData.tanggalUjian]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -110,6 +123,7 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
         const dataToSave: NewSyahadahEntry = {
             ...formData,
             ...hasil,
+            tanggalUjianHijriah: hijriDate,
         };
         await onSave(dataToSave, syahadahToEdit?.id);
         setIsSaving(false);
@@ -171,7 +185,7 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                          <h2 className="text-xl font-bold text-gray-800">Detail dan Hasil Ujian</h2>
                         <p className="text-gray-500 text-sm mt-1 mb-6">Pilih juz yang diuji dan input jumlah kesalahan siswa.</p>
                         <div className="space-y-6">
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                                 <div>
                                     <label htmlFor="juz" className="block text-sm font-medium text-gray-700 mb-1">Juz yang Diuji</label>
                                     <select 
@@ -182,7 +196,9 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                                         className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                     >
                                         <option value="">Pilih Juz</option>
-                                        {[...Array(30)].map((_, i) => <option key={i+1} value={i+1}>Juz {i+1}</option>)}
+                                        {juzOrder.map(juzNumber => (
+                                            <option key={juzNumber} value={juzNumber}>Juz {juzNumber}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <InputField
@@ -191,6 +207,13 @@ const Penilaian: React.FC<PenilaianProps> = ({ onSave, syahadahToEdit, onCancelE
                                     type="date"
                                     value={formData.tanggalUjian}
                                     onChange={handleChange}
+                                />
+                                 <InputField
+                                    label="Tanggal Hijriah"
+                                    id="tanggalHijriah"
+                                    value={hijriDate}
+                                    onChange={() => {}}
+                                    readOnly={true}
                                 />
                            </div>
                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

@@ -62,18 +62,11 @@ const App: React.FC = () => {
   };
 
   const handleViewCertificate = (syahadah: SyahadahData) => {
-    // @ts-ignore
-    const HijriDate = window.HijriDate;
-    const gregorianDate = new Date(syahadah.tanggalUjian);
-    const hijriDateString = HijriDate && !isNaN(gregorianDate.getTime())
-        ? new HijriDate(gregorianDate).toHijriString('iDD iMMMM iYYYY')
-        : '';
-    
     const certificateData: CertificateData = {
         id: syahadah.id,
         studentName: syahadah.namaSiswa,
         date: syahadah.tanggalUjian.split('T')[0],
-        hijriDate: hijriDateString,
+        hijriDate: syahadah.tanggalUjianHijriah,
         juz: syahadah.juz,
         grade: syahadah.nilaiAkhir.toFixed(2),
         predicate: syahadah.predikat,

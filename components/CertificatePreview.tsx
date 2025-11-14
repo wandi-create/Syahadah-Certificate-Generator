@@ -36,7 +36,12 @@ export const CertificatePreview = forwardRef<HTMLDivElement, CertificatePreviewP
                 <p className="mt-1">
                     pada tanggal <span className="font-bold">{formattedGregorianDate}</span>
                 </p>
-                 <p>
+                {data.hijriDate && (
+                    <p className="text-base text-gray-600">
+                        (bertepatan dengan {data.hijriDate})
+                    </p>
+                )}
+                 <p className="mt-2">
                     dengan nilai <span className="font-bold">{data.grade}</span> dan predikat <span className="font-bold">{data.predicate}</span>
                 </p>
             </div>

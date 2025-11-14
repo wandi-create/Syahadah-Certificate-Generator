@@ -6,6 +6,7 @@ export interface SyahadahData {
   gender: string;
   juz: string;
   tanggalUjian: string;
+  tanggalUjianHijriah: string;
   nilaiAkhir: number;
   predikat: string;
   status: string;
@@ -21,6 +22,7 @@ export interface NewSyahadahEntry {
   gender: string;
   juz: string;
   tanggalUjian: string;
+  tanggalUjianHijriah: string;
   jmlKetuk: number;
   jmlTuntun: number;
   jmlTajwid: number;

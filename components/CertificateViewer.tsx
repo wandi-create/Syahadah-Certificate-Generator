@@ -15,10 +15,11 @@ const CertificateViewer: React.FC<CertificateViewerProps> = ({ data, onBack }) =
     const handleGeneratePdf = async () => {
         if (!certificateRef.current) return;
         setIsGenerating(true);
-        // @ts-ignore
-        const { jsPDF } = window.jspdf;
-        // @ts-ignore
-        const html2canvas = window.html2canvas;
+        // FIX: Cast window to `any` to access globally-loaded libraries `jspdf` and `html2canvas`
+        // without TypeScript errors. This resolves the "expression is not callable" error by
+        // ensuring the libraries are treated as `any`, following the pattern used elsewhere in the app.
+        const { jsPDF } = (window as any).jspdf;
+        const html2canvas = (window as any).html2canvas;
 
         try {
             const canvas = await html2canvas(certificateRef.current, { scale: 3, useCORS: true });
