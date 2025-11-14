@@ -37,6 +37,7 @@ export interface NewSyahadahEntry {
 export interface CertificateData {
   id?: string;
   studentName: string;
+  gender: string;
   date: string;
   hijriDate: string;
   juz: string;

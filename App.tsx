@@ -65,6 +65,7 @@ const App: React.FC = () => {
     const certificateData: CertificateData = {
         id: syahadah.id,
         studentName: syahadah.namaSiswa,
+        gender: syahadah.gender,
         date: syahadah.tanggalUjian.split('T')[0],
         hijriDate: syahadah.tanggalUjianHijriah,
         juz: syahadah.juz,
