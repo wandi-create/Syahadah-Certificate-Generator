@@ -4,16 +4,21 @@ import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orde
 import { SyahadahData, NewSyahadahEntry } from './types';
 
 // ===============================================================================================
-// FIX KONEKSI UTAMA: Mengganti process.env dengan import.meta.env
+// IMPORTANT: Replace with your actual Firebase project configuration
+// You can get this from your project's settings in the Firebase console.
 // ===============================================================================================
+// FIX: Reverted to `process.env` to resolve a runtime error. The execution environment
+// provides environment variables via `process.env`, and `import.meta.env` was found to be
+// undefined, causing the application to crash.
+// Casting to `any` is used to bypass TypeScript errors, assuming `process.env` is populated
+// by the build tool.
 const firebaseConfig = {
-    // HARUS menggunakan import.meta.env di lingkungan Vite/Browser
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY, 
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: (process.env as any).VITE_FIREBASE_API_KEY,
+  authDomain: (process.env as any).VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: (process.env as any).VITE_FIREBASE_PROJECT_ID,
+  storageBucket: (process.env as any).VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: (process.env as any).VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: (process.env as any).VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase

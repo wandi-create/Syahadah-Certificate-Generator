@@ -1,5 +1,5 @@
 // This file represents the image asset for the Akhwat (female) certificate template.
-// In a real build environment, this would be an actual image file.
-// We export the path for the component to use.
-const path = 'https://storage.googleapis.com/aistudio-hosting/workspace-bq-user-322191/Syahadah_template_akhwat.png';
+// 1. Upload your 'Syahadah_template_akhwat.png' to an image hosting service (like imgur.com).
+// 2. Paste the public URL for your image below, replacing the placeholder text.
+const path = 'URL_GAMBAR_AKHWAT_ANDA_DISINI';
 export default path;
